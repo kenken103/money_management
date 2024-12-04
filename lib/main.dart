@@ -1,17 +1,12 @@
 import 'package:flutter/material.dart';
-
 import 'Inputpage.dart';
+import 'SavingsTotal.dart';
+import 'Monthlyview.dart';
 import 'Widget.dart';
-
-
-
-
 
 void main() {
   runApp(const MyApp());
 }
-
-
 
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
@@ -39,12 +34,11 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
-  int _counter = 0;
-
-  void _incrementCounter() {
-    setState(() {
-      _counter++;
-    });
+  void _navigateToPage(BuildContext context, Widget page) {
+    Navigator.push(
+      context,
+      MaterialPageRoute(builder: (context) => page),
+    );
   }
 
   @override
@@ -53,24 +47,43 @@ class _MyHomePageState extends State<MyHomePage> {
       appBar: AppBar(
         backgroundColor: Theme.of(context).colorScheme.inversePrimary,
         title: Text(widget.title),
+        centerTitle: true,
       ),
       body: Center(
-        child: CustomButton(
-          backcolor: Colors.green,
-          forecolor: Colors.black,
-          height: 50.0,
-          width: 150.0,
-          onPressed: ()=> _navigateToInputpage(context),
-          child: const Text('貯金額入力'),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.start,
+          children: <Widget>[
+            SizedBox(height: 50),
+            CustomButton(
+              backcolor: Colors.blue,
+              forecolor: Colors.white,
+              height: 50.0,
+              width: 150.0,
+              onPressed: () => _navigateToPage(context, const SavingTotal()), // 仮のページ
+              child: const Text('貯金総額'),
+            ),
+            SizedBox(height: 30),
+            CustomButton(
+              backcolor: Colors.blue,
+              forecolor: Colors.white,
+              height: 50.0,
+              width: 150.0,
+              onPressed: () => _navigateToPage(context, const Monthlyview()), // 仮のページ
+              child: const Text('月別貯金額表示'),
+            ),
+            SizedBox(height: 30),
+            CustomButton(
+              backcolor: Colors.blue,
+              forecolor: Colors.white,
+              height: 50.0,
+              width: 150.0,
+              onPressed: () => _navigateToPage(context, const Inputpage()),
+              child: const Text('貯金額入力'),
+            ),
+          ],
         ),
       ),
     );
   }
 }
 
-void _navigateToInputpage(BuildContext context) {
-  Navigator.push(
-    context,
-    MaterialPageRoute(builder: (context) => const Inputpage()),
-  );
-}

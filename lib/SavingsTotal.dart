@@ -1,19 +1,20 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
-class Inputpage extends StatelessWidget {
-  const Inputpage({super.key});
+// 合計貯金額表示画面
+class SavingTotal extends StatelessWidget {
+  const SavingTotal({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('貯金額入力'),
+        title: Text('貯金総額'),
         backgroundColor: Colors.green,
         centerTitle: true,
       ),
-      body: const Center(
-        child: Text('This is the next page'),
+      body: Center(
+        child: Text('ウィジェットページの内容'),
       ),
     );
   }

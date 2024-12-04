@@ -1,19 +1,21 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
-class Inputpage extends StatelessWidget {
-  const Inputpage({super.key});
+// 月別表示画面
+class Monthlyview extends StatelessWidget {
+  const Monthlyview({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('貯金額入力'),
+
+        title: Text('月別貯金額'),
         backgroundColor: Colors.green,
         centerTitle: true,
       ),
-      body: const Center(
-        child: Text('This is the next page'),
+      body: Center(
+        child: Text('その他のページの内容'),
       ),
     );
   }
