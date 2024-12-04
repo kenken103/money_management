@@ -40,6 +40,40 @@ class _MyHomePageState extends State<MyHomePage> {
       MaterialPageRoute(builder: (context) => page),
     );
   }
+  //パスワード入力メソッド
+  void _showPasswordDialog(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text('パスワード入力'),
+          content: TextField(
+            obscureText: true,
+            decoration: const InputDecoration(
+              labelText: 'パスワード',
+            ),
+          ),
+          actions: <Widget>[
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+              child: const Text('キャンセル'),
+            ),
+            TextButton(
+              onPressed: () {
+                // パスワード検証ロジックをここに追加
+                Navigator.of(context).pop();
+                _navigateToPage(context, const Inputpage());
+              },
+              child: const Text('OK'),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
 
   @override
   Widget build(BuildContext context) {
@@ -77,7 +111,7 @@ class _MyHomePageState extends State<MyHomePage> {
               forecolor: Colors.white,
               height: 50.0,
               width: 150.0,
-              onPressed: () => _navigateToPage(context, const Inputpage()),
+              onPressed: () => _showPasswordDialog(context),
               child: const Text('貯金額入力'),
             ),
           ],
