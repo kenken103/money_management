@@ -17,8 +17,8 @@ class SavingTotal extends StatelessWidget {
         child: Container(
           width: 300, // コンテナの幅を指定
           height: 600, // コンテナの高さを指定
-          margin: const EdgeInsets.only(top: 1000.0),
           padding: const EdgeInsets.all(8.0),
+          margin: const EdgeInsets.only(top: 50.0), // 上部マージンを追加してグリッドを上に配置
           child: GridView.builder(
             shrinkWrap: true, // GridViewのサイズを子要素の内容に合わせて調整
             gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
@@ -30,12 +30,12 @@ class SavingTotal extends StatelessWidget {
             itemCount: 14, // 2列7行で合計14アイテム
             itemBuilder: (context, index) {
               List<String> items = [
-                "名前", "貯金額", "", "", "", "", "",
+                "名前", "金額", "", "", "", "", "",
                 "", "", "", "", "", "", ""
               ];
               return Container(
                 alignment: Alignment.center,
-                color: Colors.white,
+                color: Colors.white38,
                 child: Text(
                   items[index],
                   style: TextStyle(color: Colors.black, fontSize: 16),
