@@ -34,13 +34,16 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
+  final TextEditingController _passwordController = TextEditingController();
+  final String correctPassword = "3150"; // 正しいパスワードをここに設定
+
   void _navigateToPage(BuildContext context, Widget page) {
     Navigator.push(
       context,
       MaterialPageRoute(builder: (context) => page),
     );
   }
-  //パスワード入力メソッド
+
   void _showPasswordDialog(BuildContext context) {
     showDialog(
       context: context,
@@ -48,6 +51,7 @@ class _MyHomePageState extends State<MyHomePage> {
         return AlertDialog(
           title: const Text('パスワード入力'),
           content: TextField(
+            controller: _passwordController,
             obscureText: true,
             decoration: const InputDecoration(
               labelText: 'パスワード',
@@ -62,9 +66,18 @@ class _MyHomePageState extends State<MyHomePage> {
             ),
             TextButton(
               onPressed: () {
-                // パスワード検証ロジックをここに追加
-                Navigator.of(context).pop();
-                _navigateToPage(context, const Inputpage());
+                // パスワード検証ロジック
+                if (_passwordController.text == correctPassword) {
+                  Navigator.of(context).pop();
+                  _navigateToPage(context, const Inputpage());
+                } else {
+                  // パスワードが間違っている場合の処理
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(
+                      content: Text('パスワードが間違っています'),
+                    ),
+                  );
+                }
               },
               child: const Text('OK'),
             ),
@@ -73,7 +86,6 @@ class _MyHomePageState extends State<MyHomePage> {
       },
     );
   }
-
 
   @override
   Widget build(BuildContext context) {
@@ -120,4 +132,3 @@ class _MyHomePageState extends State<MyHomePage> {
     );
   }
 }
-
