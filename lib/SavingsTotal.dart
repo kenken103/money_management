@@ -1,48 +1,141 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:http/http.dart' as http;
+import 'dart:convert';
 
 // 合計貯金額表示画面
-class SavingTotal extends StatelessWidget {
+class SavingTotal extends StatefulWidget {
   const SavingTotal({Key? key}) : super(key: key);
 
   @override
+  _SavingTotalState createState() => _SavingTotalState();
+}
+
+class _SavingTotalState extends State<SavingTotal> {
+  List<Map<String, dynamic>> items = [];
+
+  @override
+  void initState() {
+    super.initState();
+    _fetchItems();
+  }
+
+  Future<void> _fetchItems() async {
+    final response = await http.get(Uri.parse('http://localhost:3000/totalmoney'));
+
+    if (response.statusCode == 200) {
+      final List<dynamic> datas = json.decode(response.body);
+      print(datas); // レスポンスデータをログに出力
+      setState(() {
+        // 取得データをテーブルに表示させる
+        items = datas
+            .map((data) => {
+          'name': data['name'],
+          'money': data['total_money'] + "円",
+        })
+            .toList();
+      });
+    } else {
+      throw Exception('Failed to load items');
+    }
+  }
+
+  // 合計貯金額を計算する関数
+  int _calculateTotalSavings() {
+    return items.fold(0, (sum, item) {
+      final moneyStr = item['money'].replaceAll('円', ''); // '円'を除去
+      final moneyValue = int.tryParse(moneyStr) ?? 0;     // 文字列から数値に変換。失敗した場合は0を返す
+      return sum + moneyValue;                            // 合計に加算
+    });
+  }
+
+  @override
   Widget build(BuildContext context) {
+    final totalSavings = _calculateTotalSavings(); // 合計を計算
+
     return Scaffold(
       appBar: AppBar(
         title: Text('貯金総額'),
         backgroundColor: Colors.green,
         centerTitle: true,
       ),
-      body: Center(
-        child: Container(
-          width: 300, // コンテナの幅を指定
-          height: 600, // コンテナの高さを指定
-          padding: const EdgeInsets.all(8.0),
-          margin: const EdgeInsets.only(top: 50.0), // 上部マージンを追加してグリッドを上に配置
-          child: GridView.builder(
-            shrinkWrap: true, // GridViewのサイズを子要素の内容に合わせて調整
-            gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-              crossAxisCount: 2, // 2列
-              mainAxisSpacing: 5.0, // 垂直方向のスペース
-              crossAxisSpacing: 5.0, // 水平方向のスペース
-              childAspectRatio: 5 / 1, // 幅と高さの比率
+      body: Padding(
+        padding: const EdgeInsets.all(8.0),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start, // 左上に詰める
+          children: [
+            Container(
+              margin: const EdgeInsets.only(top: 20.0), // 上部マージンを調整
+              child: Table(
+                border: TableBorder.all(color: Colors.black),
+                columnWidths: {
+                  0: FlexColumnWidth(1),
+                  1: FlexColumnWidth(1),
+                },
+                children: [
+                  TableRow(
+                    decoration: BoxDecoration(
+                      color: Colors.yellow, // ヘッダーカラムの背景色を設定
+                    ),
+                    children: [
+                      Padding(
+                        padding: const EdgeInsets.all(8.0),
+                        child: Text(
+                          '名前',
+                          style: TextStyle(
+                            fontWeight: FontWeight.bold,
+                            color: Colors.black, // ヘッダーテキストの色を設定
+                          ),
+                          textAlign: TextAlign.center,
+                        ),
+                      ),
+                      Padding(
+                        padding: const EdgeInsets.all(8.0),
+                        child: Text(
+                          '貯金額',
+                          style: TextStyle(
+                            fontWeight: FontWeight.bold,
+                            color: Colors.black, // ヘッダーテキストの色を設定
+                          ),
+                          textAlign: TextAlign.center,
+                        ),
+                      ),
+                    ],
+                  ),
+                  for (var item in items)
+                    TableRow(
+                      children: [
+                        Padding(
+                          padding: const EdgeInsets.all(8.0),
+                          child: Text(item['name'], textAlign: TextAlign.center),
+                        ),
+                        Padding(
+                          padding: const EdgeInsets.all(8.0),
+                          child: Text(item['money'].toString(),
+                              textAlign: TextAlign.center),
+                        ),
+                      ],
+                    ),
+                ],
+              ),
             ),
-            itemCount: 14, // 2列7行で合計14アイテム
-            itemBuilder: (context, index) {
-              List<String> items = [
-                "名前", "金額", "", "", "", "", "",
-                "", "", "", "", "", "", ""
-              ];
-              return Container(
-                alignment: Alignment.center,
-                color: Colors.white38,
+            // 合計金額表示
+            // 合計金額表示
+            Center(
+              child: Padding(
+                padding: const EdgeInsets.only(top: 16.0),
                 child: Text(
-                  items[index],
-                  style: TextStyle(color: Colors.black, fontSize: 16),
+                  '合計貯金額: $totalSavings円',
+                  style: TextStyle(
+                    fontSize: 20, // テキストサイズ
+                    fontWeight: FontWeight.bold, // 太字
+                    color: Colors.blue, // テキスト色を青色に変更
+                  ),
+                  textAlign: TextAlign.center, // 中央揃え
                 ),
-              );
-            },
-          ),
+              ),
+            ),
+          ],
         ),
       ),
     );

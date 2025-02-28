@@ -69,7 +69,7 @@ class _MyHomePageState extends State<MyHomePage> {
                 // パスワード検証ロジック
                 if (_passwordController.text == correctPassword) {
                   Navigator.of(context).pop();
-                  _navigateToPage(context, const Inputpage());
+                  _navigateToPage(context,  AddTransactionPage());
                 } else {
                   // パスワードが間違っている場合の処理
                   ScaffoldMessenger.of(context).showSnackBar(
