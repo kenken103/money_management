@@ -81,6 +81,31 @@ app.get('/data', async (req, res) => {
   }
 });
 
+// 貯金追加
+app.get('/Input', async (req, res) => {
+  const { user_id, amount } = req.query; // クエリパラメータからuser_idとamountを取得
+
+  if (!user_id || !amount) {
+    return res.status(400).send('user_id and amount parameters are required'); // user_idまたはamountが指定されていない場合
+  }
+
+  try {
+    const result = await pool.query(
+      `
+      INSERT INTO public.money(
+        user_id, money, date, memo)
+        VALUES ($1, $2, CURRENT_DATE, '')
+      `, // クエリの括弧を修正
+      [user_id, amount] // プレースホルダを使用
+    );
+
+    res.status(201).send('Data inserted successfully'); // 成功時のメッセージ
+  } catch (err) {
+    console.error('Database query error:', err); // エラーメッセージをログ出力
+    res.status(500).send('Server error'); // サーバーエラー
+  }
+});
+
 
 app.listen(port, () => {
   console.log(`Server running at http://localhost:${port}`);
