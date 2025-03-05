@@ -26,3 +26,8 @@ linter:
 
 # Additional information about this file can be found at
 # https://dart.dev/guides/language/analysis-options
+
+# 不要なフラグを削除します
+analyzer:
+# 他の設定があればここに記述します
+
