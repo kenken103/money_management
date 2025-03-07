@@ -1,9 +1,7 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 
-// 合計貯金額表示画面
 class SavingTotal extends StatefulWidget {
   const SavingTotal({Key? key}) : super(key: key);
 
@@ -21,22 +19,30 @@ class _SavingTotalState extends State<SavingTotal> {
   }
 
   Future<void> _fetchItems() async {
-    final response = await http.get(Uri.parse('http://localhost:3000/totalmoney'));
+    print('Fetching items...');
+    try {
+      final response = await http.get(
+        Uri.parse('https://z6l2uosz0l.execute-api.ap-northeast-1.amazonaws.com/dev/totalmoney'),
+        headers: {
+          'Content-Type': 'application/json; charset=utf-8',
+        },
+      );
 
-    if (response.statusCode == 200) {
-      final List<dynamic> datas = json.decode(response.body);
-      print(datas); // レスポンスデータをログに出力
-      setState(() {
-        // 取得データをテーブルに表示させる
-        items = datas
-            .map((data) => {
-          'name': data['name'],
-          'money': data['total_money'] + "円",
-        })
-            .toList();
-      });
-    } else {
-      throw Exception('Failed to load items');
+      if (response.statusCode == 200) {
+        final List<dynamic> data = json.decode(utf8.decode(response.bodyBytes));
+        print('Data received: $data'); // レスポンスデータをログに出力
+        setState(() {
+          items = data.map((item) => {
+            'name': item['name'],
+            'money': (item['total_money'] ?? 0).toString() + "円",
+          }).toList();
+        });
+      } else {
+        print('Failed to load items. Status code: ${response.statusCode}');
+        throw Exception('Failed to load items');
+      }
+    } catch (e) {
+      print('Error fetching items: $e');
     }
   }
 
@@ -119,7 +125,6 @@ class _SavingTotalState extends State<SavingTotal> {
                 ],
               ),
             ),
-            // 合計金額表示
             // 合計金額表示
             Center(
               child: Padding(
