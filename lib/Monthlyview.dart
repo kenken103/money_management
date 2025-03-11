@@ -24,22 +24,45 @@ class _MonthlyviewState extends State<Monthlyview> {
   }
 
   Future<void> _fetchMembers() async {
-    final response =
-    await http.get(Uri.parse('http://localhost:3000/MenberName'));
+    try {
+      final response = await http.get(
+        Uri.parse('https://z6l2uosz0l.execute-api.ap-northeast-1.amazonaws.com/dev/MenberName'),
+        headers: {
+          'Content-Type': 'application/json; charset=utf-8',
+        },
+      );
 
-    if (response.statusCode == 200) {
-      final List<dynamic> data = json.decode(response.body);
+      // デバッグ用ログ
+      print('Response status: ${response.statusCode}');
+      print('Response body: ${response.body}');
+
+      if (response.statusCode == 200) {
+        // UTF-8としてデコードして文字化けを回避
+        final decodedResponse = utf8.decode(response.bodyBytes); // 修正ポイント
+        final data = json.decode(decodedResponse); // デコードしたデータをJSONとして解析
+
+        if (data is List<dynamic>) {
+          setState(() {
+            members = data
+                .map((item) => {
+              'name': item['name'],
+              'id': item['id'],
+            })
+                .toList();
+            isLoadingMembers = false;
+          });
+        } else {
+          throw Exception('Invalid response format: expected a list.');
+        }
+      } else {
+        throw Exception('Failed to load members with status code: ${response.statusCode}');
+      }
+    } catch (e) {
+      print('Error fetching members: $e');
       setState(() {
-        members = data
-            .map((item) => {
-          'name': item['name'],
-          'id': item['id'],
-        })
-            .toList();
         isLoadingMembers = false;
+        members = [];
       });
-    } else {
-      throw Exception('Failed to load members');
     }
   }
 
@@ -48,24 +71,40 @@ class _MonthlyviewState extends State<Monthlyview> {
       isFetchingData = true;
     });
 
-    final response =
-    await http.get(Uri.parse('http://localhost:3000/data?user_id=$userId'));
+    try {
+      final response = await http.get(
+        Uri.parse(
+            'https://z6l2uosz0l.execute-api.ap-northeast-1.amazonaws.com/dev/data?user_id=$userId'),
+        headers: {
+          'Content-Type': 'application/json; charset=utf-8',
+        },
+      );
 
-    if (response.statusCode == 200) {
-      final List<dynamic> data = json.decode(response.body);
+      if (response.statusCode == 200) {
+        // UTF-8としてデコードして文字化けを回避
+        final decodedResponse = utf8.decode(response.bodyBytes); // 修正ポイント
+        final List<dynamic> data = json.decode(decodedResponse);
+
+        setState(() {
+          fetchedData = data
+              .map((item) => {
+            'date': item['date'],
+            'money': item['money'],
+          })
+              .toList();
+          isFetchingData = false;
+        });
+      } else {
+        setState(() {
+          fetchedData = [];
+          isFetchingData = false;
+        });
+      }
+    } catch (e) {
+      print('Error fetching data: $e');
       setState(() {
-        fetchedData = data
-            .map((item) => {
-          'date': item['date'],
-          'money': item['money'],
-        })
-            .toList();
         isFetchingData = false;
-      });
-    } else {
-      setState(() {
         fetchedData = [];
-        isFetchingData = false;
       });
     }
   }
@@ -86,19 +125,19 @@ class _MonthlyviewState extends State<Monthlyview> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('月別貯金額'),
+        title: const Text('月別貯金額'),
         backgroundColor: Colors.green,
         centerTitle: true,
       ),
       body: isLoadingMembers
-          ? Center(child: CircularProgressIndicator())
+          ? const Center(child: CircularProgressIndicator())
           : Padding(
         padding: const EdgeInsets.all(8.0),
         child: Column(
           children: [
             DropdownButton<String>(
               isExpanded: true,
-              hint: Text('名前を選択'),
+              hint: const Text('名前を選択'),
               value: selectedName,
               items: members.map((member) {
                 return DropdownMenuItem<String>(
@@ -123,10 +162,9 @@ class _MonthlyviewState extends State<Monthlyview> {
             if (fetchedData.isNotEmpty)
               Column(
                 children: [
-                  // 合計金額表示（グリッドの上部）
                   Text(
                     '合計貯金額: ${calculateTotalSavings()}円',
-                    style: TextStyle(
+                    style: const TextStyle(
                       fontSize: 18,
                       fontWeight: FontWeight.bold,
                       color: Colors.blue,
@@ -137,25 +175,25 @@ class _MonthlyviewState extends State<Monthlyview> {
                 ],
               ),
             if (isFetchingData)
-              Center(child: CircularProgressIndicator())
+              const Center(child: CircularProgressIndicator())
             else if (fetchedData.isNotEmpty)
               Expanded(
                 child: SingleChildScrollView(
                   child: Table(
                     border: TableBorder.all(color: Colors.grey),
-                    columnWidths: {
+                    columnWidths: const {
                       0: FlexColumnWidth(1),
                       1: FlexColumnWidth(1),
                     },
                     children: [
                       TableRow(
-                        decoration: BoxDecoration(
+                        decoration: const BoxDecoration(
                           color: Colors.yellow,
                         ),
                         children: [
                           Padding(
                             padding: const EdgeInsets.all(8.0),
-                            child: Text(
+                            child: const Text(
                               '日付',
                               style: TextStyle(
                                 fontWeight: FontWeight.bold,
@@ -166,7 +204,7 @@ class _MonthlyviewState extends State<Monthlyview> {
                           ),
                           Padding(
                             padding: const EdgeInsets.all(8.0),
-                            child: Text(
+                            child: const Text(
                               '貯金額',
                               style: TextStyle(
                                 fontWeight: FontWeight.bold,
@@ -201,7 +239,7 @@ class _MonthlyviewState extends State<Monthlyview> {
                 ),
               )
             else
-              Center(
+              const Center(
                 child: Text(
                   'データがありません',
                   style: TextStyle(fontSize: 16, color: Colors.grey),
