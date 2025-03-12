@@ -23,19 +23,25 @@ class _AddTransactionPageState extends State<AddTransactionPage> {
   }
 
   Future<void> _fetchMembers() async {
-    final response = await http.get(Uri.parse('http://localhost:3000/MenberName'));
+    try {
+      final response = await http.get(Uri.parse('https://z6l2uosz0l.execute-api.ap-northeast-1.amazonaws.com/dev/MenberName'));
 
-    if (response.statusCode == 200) {
-      final List<dynamic> data = json.decode(response.body);
-      setState(() {
-        members = data.map((item) => {
-          'name': item['name'],
-          'id': item['id'],
-        }).toList();
-        isLoadingMembers = false;
-      });
-    } else {
-      throw Exception('Failed to load members');
+      if (response.statusCode == 200) {
+        // UTF-8デコードを適用
+        final body = utf8.decode(response.bodyBytes);
+        final List<dynamic> data = json.decode(body);
+        setState(() {
+          members = data.map((item) => {
+            'name': item['name'],
+            'id': item['id'],
+          }).toList();
+          isLoadingMembers = false;
+        });
+      } else {
+        throw Exception('Failed to load members');
+      }
+    } catch (e) {
+      print('Error fetching members: $e');
     }
   }
 
@@ -44,43 +50,91 @@ class _AddTransactionPageState extends State<AddTransactionPage> {
       isFetchingData = true;
     });
 
-    final response = await http.get(Uri.parse('http://localhost:3000/data?user_id=$userId'));
+    try {
+      final response = await http.get(Uri.parse('https://z6l2uosz0l.execute-api.ap-northeast-1.amazonaws.com/dev/data?user_id=$userId'));
 
-    if (response.statusCode == 200) {
-      final List<dynamic> data = json.decode(response.body);
+      if (response.statusCode == 200) {
+        // UTF-8デコードを適用
+        final body = utf8.decode(response.bodyBytes);
+        final List<dynamic> data = json.decode(body);
+        setState(() {
+          fetchedData = data.map((item) => {
+            'date': item['date'],
+            'money': item['money'],
+          }).toList();
+          isFetchingData = false;
+        });
+      } else {
+        setState(() {
+          fetchedData = [];
+          isFetchingData = false;
+        });
+      }
+    } catch (e) {
+      print('Error fetching data: $e');
       setState(() {
-        fetchedData = data.map((item) => {
-          'date': item['date'],
-          'money': item['money'],
-        }).toList();
-        isFetchingData = false;
-      });
-    } else {
-      setState(() {
-        fetchedData = [];
         isFetchingData = false;
       });
     }
   }
 
+
   Future<void> _submitTransaction() async {
-    if (selectedUserId != null && amountController.text.isNotEmpty) {
-      final response = await http.get(
-        Uri.parse('http://localhost:3000/Input?user_id=$selectedUserId&amount=${amountController.text}'),
+    // 入力バリデーション
+    if (selectedUserId == null) {
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+        content: Text('ユーザーを選択してください'),
+      ));
+      return;
+    }
+
+    if (amountController.text.isEmpty || double.tryParse(amountController.text) == null) {
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+        content: Text('金額を正確に入力してください'),
+      ));
+      return;
+    }
+
+    try {
+      // 送信データを表示してデバッグ確認
+      final requestData = {
+        'user_id': selectedUserId,
+        'amount': amountController.text, // 数値形式である必要があります
+      };
+
+      final response = await http.post(
+        Uri.parse('https://z6l2uosz0l.execute-api.ap-northeast-1.amazonaws.com/dev/Input'),
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: json.encode(requestData), // JSON形式でエンコード
       );
 
-      if (response.statusCode != 400) {
+
+      if (response.statusCode == 201) {
         ScaffoldMessenger.of(context).showSnackBar(SnackBar(
           content: Text('登録完了'),
         ));
-        amountController.clear();
+        amountController.clear(); // 入力内容をクリア
       } else {
+        // サーバー側エラー表示
         ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-          content: Text('エラーが発生しました'),
+          content: Text('エラーが発生しました: ${response.body}'),
         ));
+        print('レスポンスヘッダー: ${response.headers}');
+        print('レスポンスボディ: ${response.body}');
+
       }
+    } catch (e) {
+      // 通信エラーのキャッチ
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+        content: Text('通信エラーが発生しました'),
+      ));
+      print('Error submitting transaction: $e');
     }
   }
+
+
 
   @override
   Widget build(BuildContext context) {
