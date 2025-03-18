@@ -46,6 +46,7 @@ class _OrganaizerCheck extends State<OrganaizerCheck> {
       initialDate: DateTime.now(),
       firstDate: DateTime(2000),
       lastDate: DateTime(2100),
+      locale: const Locale('ja'), // 日本語のロケールを設定
     );
 
     if (pickedDate != null) {
@@ -55,8 +56,8 @@ class _OrganaizerCheck extends State<OrganaizerCheck> {
     }
   }
 
+
   void _saveData() {
-    // 保存ボタンが押されたときの処理を記述
     if (selectedCheckboxIndex != null && selectedDate != null) {
       final selectedName = items[selectedCheckboxIndex!]['name'];
       final date = '${selectedDate!.toLocal().year}-${selectedDate!.toLocal().month}-${selectedDate!.toLocal().day}';
@@ -108,29 +109,32 @@ class _OrganaizerCheck extends State<OrganaizerCheck> {
                 0: FlexColumnWidth(1),
                 1: FlexColumnWidth(1),
               },
-              defaultVerticalAlignment: TableCellVerticalAlignment.middle,
               children: [
                 TableRow(
                   decoration: BoxDecoration(color: Colors.yellow),
                   children: [
-                    Padding(
-                      padding: const EdgeInsets.all(8.0),
-                      child: Text(
-                        '名前',
-                        style: TextStyle(
-                            fontWeight: FontWeight.bold,
-                            color: Colors.black),
-                        textAlign: TextAlign.center,
+                    SizedBox(
+                      height: 30.0,
+                      child: Center(
+                        child: Text(
+                          '名前',
+                          style: TextStyle(
+                              fontWeight: FontWeight.bold,
+                              color: Colors.black),
+                          textAlign: TextAlign.center,
+                        ),
                       ),
                     ),
-                    Padding(
-                      padding: const EdgeInsets.all(8.0),
-                      child: Text(
-                        '幹事選択',
-                        style: TextStyle(
-                            fontWeight: FontWeight.bold,
-                            color: Colors.black),
-                        textAlign: TextAlign.center,
+                    SizedBox(
+                      height: 30.0,
+                      child: Center(
+                        child: Text(
+                          '幹事選択',
+                          style: TextStyle(
+                              fontWeight: FontWeight.bold,
+                              color: Colors.black),
+                          textAlign: TextAlign.center,
+                        ),
                       ),
                     ),
                   ],
@@ -138,27 +142,31 @@ class _OrganaizerCheck extends State<OrganaizerCheck> {
                 for (int i = 0; i < items.length; i++)
                   TableRow(
                     children: [
-                      Padding(
-                        padding: const EdgeInsets.all(8.0),
-                        child: Text(
-                          items[i]['name'],
-                          textAlign: TextAlign.center,
-                          style: TextStyle(fontSize: 16),
+                      SizedBox(
+                        height: 30.0,
+                        child: Center(
+                          child: Text(
+                            items[i]['name'],
+                            textAlign: TextAlign.center,
+                            style: TextStyle(fontSize: 16),
+                          ),
                         ),
                       ),
-                      Padding(
-                        padding: const EdgeInsets.all(8.0),
-                        child: Checkbox(
-                          value: selectedCheckboxIndex == i,
-                          onChanged: (bool? value) {
-                            setState(() {
-                              if (value == true) {
-                                selectedCheckboxIndex = i;
-                              } else {
-                                selectedCheckboxIndex = null;
-                              }
-                            });
-                          },
+                      SizedBox(
+                        height: 30.0,
+                        child: Center(
+                          child: Checkbox(
+                            value: selectedCheckboxIndex == i,
+                            onChanged: (bool? value) {
+                              setState(() {
+                                if (value == true) {
+                                  selectedCheckboxIndex = i;
+                                } else {
+                                  selectedCheckboxIndex = null;
+                                }
+                              });
+                            },
+                          ),
                         ),
                       ),
                     ],
@@ -209,3 +217,6 @@ class _OrganaizerCheck extends State<OrganaizerCheck> {
     );
   }
 }
+
+
+

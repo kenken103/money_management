@@ -4,6 +4,7 @@ import 'Inputpage.dart';
 import 'SavingsTotal.dart';
 import 'Monthlyview.dart';
 import 'Widget.dart';
+import 'package:flutter_localizations/flutter_localizations.dart';
 
 void main() {
   runApp(const MyApp());
@@ -20,6 +21,15 @@ class MyApp extends StatelessWidget {
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.green),
         useMaterial3: true,
       ),
+      localizationsDelegates: [
+        GlobalMaterialLocalizations.delegate,
+        GlobalWidgetsLocalizations.delegate,
+        GlobalCupertinoLocalizations.delegate, // 必要に応じて
+      ],
+      supportedLocales: [
+        const Locale('ja', 'JP'), // 日本語
+      ],
+      locale: const Locale('ja', 'JP'), // アプリ全体のロケールを日本語に設定
       home: const MyHomePage(title: '貯金会メインメニュー'),
     );
   }
@@ -45,7 +55,6 @@ class _MyHomePageState extends State<MyHomePage> {
     );
   }
 
-
   void _showPasswordDialog(BuildContext context) {
     showDialog(
       context: context,
@@ -68,12 +77,10 @@ class _MyHomePageState extends State<MyHomePage> {
             ),
             TextButton(
               onPressed: () {
-                // パスワード検証ロジック
                 if (_passwordController.text == correctPassword) {
                   Navigator.of(context).pop();
-                  _navigateToPage(context,  AddTransactionPage());
+                  _navigateToPage(context, AddTransactionPage());
                 } else {
-                  // パスワードが間違っている場合の処理
                   ScaffoldMessenger.of(context).showSnackBar(
                     const SnackBar(
                       content: Text('パスワードが間違っています'),
@@ -101,25 +108,25 @@ class _MyHomePageState extends State<MyHomePage> {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.start,
           children: <Widget>[
-            SizedBox(height: 30),
+            const SizedBox(height: 30),
             CustomButton(
               backcolor: Colors.blue,
               forecolor: Colors.white,
               height: 50.0,
               width: 150.0,
-              onPressed: () => _navigateToPage(context, const SavingTotal()), // 仮のページ
+              onPressed: () => _navigateToPage(context, const SavingTotal()),
               child: const Text('貯金総額'),
             ),
-            SizedBox(height: 30),
+            const SizedBox(height: 30),
             CustomButton(
               backcolor: Colors.blue,
               forecolor: Colors.white,
               height: 50.0,
               width: 150.0,
-              onPressed: () => _navigateToPage(context, const Monthlyview()), // 仮のページ
+              onPressed: () => _navigateToPage(context, const Monthlyview()),
               child: const Text('月別貯金額表示'),
             ),
-            SizedBox(height: 30),
+            const SizedBox(height: 30),
             CustomButton(
               backcolor: Colors.blue,
               forecolor: Colors.white,
@@ -128,13 +135,13 @@ class _MyHomePageState extends State<MyHomePage> {
               onPressed: () => _showPasswordDialog(context),
               child: const Text('貯金額入力'),
             ),
-            SizedBox(height: 30),
+            const SizedBox(height: 30),
             CustomButton(
               backcolor: Colors.blue,
               forecolor: Colors.white,
               height: 50.0,
               width: 150.0,
-              onPressed: () => _navigateToPage(context, const OrganaizerCheck()), // 仮のページ
+              onPressed: () => _navigateToPage(context, const OrganaizerCheck()),
               child: const Text('幹事確認'),
             ),
           ],
