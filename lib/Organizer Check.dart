@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 
+import 'Widget.dart';
+
 class OrganaizerCheck extends StatefulWidget {
   const OrganaizerCheck({Key? key}) : super(key: key);
 
@@ -85,6 +87,21 @@ class _OrganaizerCheck extends State<OrganaizerCheck> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
+            Center(
+              child: Padding(
+                padding: const EdgeInsets.only(top: 16.0),
+                child: Text(
+                  '○○の幹事: けんたろう',
+                  style: TextStyle(
+                    fontSize: 20, // テキストサイズ
+                    fontWeight: FontWeight.bold, // 太字
+                    color: Colors.blue, // テキスト色を青色に変更
+                  ),
+                  textAlign: TextAlign.center, // 中央揃え
+                ),
+              ),
+            ),
+            SizedBox(height: 20),
             Table(
               border: TableBorder.all(color: Colors.black),
               columnWidths: {
@@ -149,7 +166,11 @@ class _OrganaizerCheck extends State<OrganaizerCheck> {
             SizedBox(height: 20),
             Row(
               children: [
-                ElevatedButton(
+                CustomButton(
+                  backcolor: Colors.blue,
+                  forecolor: Colors.white,
+                  height: 30.0,
+                  width: 200.0,
                   onPressed: _pickDate,
                   child: Text('次回の開催日を選択'),
                 ),
@@ -165,13 +186,17 @@ class _OrganaizerCheck extends State<OrganaizerCheck> {
             SizedBox(height: 20),
             Text(
               selectedCheckboxIndex == null
-                  ? '未選択'
+                  ? '次回の幹事：未選択'
                   : '次回の幹事: ${items[selectedCheckboxIndex!]['name']}',
               style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
             ),
             SizedBox(height: 20),
             Center(
-              child: ElevatedButton(
+              child: CustomButton(
+                backcolor: Colors.blue,
+                forecolor: Colors.white,
+                height: 30.0,
+                width: 200.0,
                 onPressed: _saveData,
                 child: Text('保存'),
               ),
