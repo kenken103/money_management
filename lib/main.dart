@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:money_management/Organizer%20Check.dart';
 import 'Inputpage.dart';
 import 'SavingsTotal.dart';
 import 'Monthlyview.dart';
@@ -43,6 +44,7 @@ class _MyHomePageState extends State<MyHomePage> {
       MaterialPageRoute(builder: (context) => page),
     );
   }
+
 
   void _showPasswordDialog(BuildContext context) {
     showDialog(
@@ -125,6 +127,15 @@ class _MyHomePageState extends State<MyHomePage> {
               width: 150.0,
               onPressed: () => _showPasswordDialog(context),
               child: const Text('貯金額入力'),
+            ),
+            SizedBox(height: 30),
+            CustomButton(
+              backcolor: Colors.blue,
+              forecolor: Colors.white,
+              height: 50.0,
+              width: 150.0,
+              onPressed: () => _navigateToPage(context, const OrganaizerCheck()), // 仮のページ
+              child: const Text('幹事確認'),
             ),
           ],
         ),
