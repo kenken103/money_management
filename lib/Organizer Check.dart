@@ -2,8 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 
-import 'Widget.dart';
-
 class OrganaizerCheck extends StatefulWidget {
   const OrganaizerCheck({Key? key}) : super(key: key);
 
@@ -93,85 +91,89 @@ class _OrganaizerCheck extends State<OrganaizerCheck> {
                 child: Text(
                   '○○の幹事: けんたろう',
                   style: TextStyle(
-                    fontSize: 20, // テキストサイズ
-                    fontWeight: FontWeight.bold, // 太字
-                    color: Colors.blue, // テキスト色を青色に変更
+                    fontSize: 20,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.blue,
                   ),
-                  textAlign: TextAlign.center, // 中央揃え
+                  textAlign: TextAlign.center,
                 ),
               ),
             ),
             SizedBox(height: 20),
-            Table(
-              border: TableBorder.all(color: Colors.black),
-              columnWidths: {
-                0: FlexColumnWidth(1),
-                1: FlexColumnWidth(1),
-              },
-              children: [
-                TableRow(
-                  decoration: BoxDecoration(color: Colors.yellow),
+            Expanded(
+              child: SingleChildScrollView(
+                child: Table(
+                  border: TableBorder.all(color: Colors.black),
+                  columnWidths: {
+                    0: FlexColumnWidth(1),
+                    1: FlexColumnWidth(1),
+                  },
                   children: [
-                    Padding(
-                      padding: const EdgeInsets.all(8.0),
-                      child: Text(
-                        '名前',
-                        style: TextStyle(
-                            fontWeight: FontWeight.bold,
-                            color: Colors.black),
-                        textAlign: TextAlign.center,
-                      ),
+                    TableRow(
+                      decoration: BoxDecoration(color: Colors.yellow),
+                      children: [
+                        Padding(
+                          padding: const EdgeInsets.all(8.0),
+                          child: Text(
+                            '名前',
+                            style: TextStyle(
+                                fontWeight: FontWeight.bold,
+                                color: Colors.black),
+                            textAlign: TextAlign.center,
+                          ),
+                        ),
+                        Padding(
+                          padding: const EdgeInsets.all(8.0),
+                          child: Text(
+                            '幹事選択',
+                            style: TextStyle(
+                                fontWeight: FontWeight.bold,
+                                color: Colors.black),
+                            textAlign: TextAlign.center,
+                          ),
+                        ),
+                      ],
                     ),
-                    Padding(
-                      padding: const EdgeInsets.all(8.0),
-                      child: Text(
-                        '確認',
-                        style: TextStyle(
-                            fontWeight: FontWeight.bold,
-                            color: Colors.black),
-                        textAlign: TextAlign.center,
+                    for (int i = 0; i < items.length; i++)
+                      TableRow(
+                        children: [
+                          Padding(
+                            padding: const EdgeInsets.all(8.0),
+                            child: Text(
+                              items[i]['name'],
+                              textAlign: TextAlign.center,
+                            ),
+                          ),
+                          Padding(
+                            padding: const EdgeInsets.all(8.0),
+                            child: Checkbox(
+                              value: selectedCheckboxIndex == i,
+                              onChanged: (bool? value) {
+                                setState(() {
+                                  if (value == true) {
+                                    selectedCheckboxIndex = i;
+                                  } else {
+                                    selectedCheckboxIndex = null;
+                                  }
+                                });
+                              },
+                            ),
+                          ),
+                        ],
                       ),
-                    ),
                   ],
                 ),
-                for (int i = 0; i < items.length; i++)
-                  TableRow(
-                    children: [
-                      Padding(
-                        padding: const EdgeInsets.all(8.0),
-                        child: Text(
-                          items[i]['name'],
-                          textAlign: TextAlign.center,
-                        ),
-                      ),
-                      Padding(
-                        padding: const EdgeInsets.all(8.0),
-                        child: Checkbox(
-                          value: selectedCheckboxIndex == i,
-                          onChanged: (bool? value) {
-                            setState(() {
-                              if (value == true) {
-                                selectedCheckboxIndex = i;
-                              } else {
-                                selectedCheckboxIndex = null;
-                              }
-                            });
-                          },
-                        ),
-                      ),
-                    ],
-                  ),
-              ],
+              ),
             ),
             SizedBox(height: 20),
             Row(
               children: [
-                CustomButton(
-                  backcolor: Colors.blue,
-                  forecolor: Colors.white,
-                  height: 30.0,
-                  width: 200.0,
+                ElevatedButton(
                   onPressed: _pickDate,
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.blue,
+                    foregroundColor: Colors.white,
+                  ),
                   child: Text('次回の開催日を選択'),
                 ),
                 SizedBox(width: 20),
@@ -192,12 +194,12 @@ class _OrganaizerCheck extends State<OrganaizerCheck> {
             ),
             SizedBox(height: 20),
             Center(
-              child: CustomButton(
-                backcolor: Colors.blue,
-                forecolor: Colors.white,
-                height: 30.0,
-                width: 200.0,
+              child: ElevatedButton(
                 onPressed: _saveData,
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.blue,
+                  foregroundColor: Colors.white,
+                ),
                 child: Text('保存'),
               ),
             ),
