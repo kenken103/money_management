@@ -179,10 +179,11 @@ class _OrganaizerCheck extends State<OrganaizerCheck> {
                 CustomButton(
                   backcolor: Colors.blue,
                   forecolor: Colors.white,
-                  height: 30.0,
-                  width: 200.0,
+                  height: 60.0,
+                  width: 100.0,
                   onPressed: _pickDate,
-                  child: Text('次回の開催日を選択'),
+                  child: Text('開催日選択',textAlign: TextAlign.center) // テキスト中央揃え),
+
                 ),
                 SizedBox(width: 20),
                 Text(
