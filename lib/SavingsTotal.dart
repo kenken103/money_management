@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 
+import 'Monthlyview.dart';
+
 class SavingTotal extends StatefulWidget {
   const SavingTotal({Key? key}) : super(key: key);
 
@@ -35,6 +37,7 @@ class _SavingTotalState extends State<SavingTotal> {
           items = data.map((item) => {
             'name': item['name'],
             'money': (item['total_money'] ?? 0).toString() + "円",
+            'id':item['user_id'],
           }).toList();
         });
       } else {
@@ -108,17 +111,38 @@ class _SavingTotalState extends State<SavingTotal> {
                       ),
                     ],
                   ),
-                  for (var item in items)
+                  for (var item in items) // シングルループにする
                     TableRow(
                       children: [
-                        Padding(
-                          padding: const EdgeInsets.all(8.0),
-                          child: Text(item['name'], textAlign: TextAlign.center),
+                        GestureDetector(
+                          onTap: () {
+                            final userId = item['id']; // itemsから直接useridを取得
+                            print(item['id']);
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => Monthlyview(userId: userId), // userIdを渡す
+                              ),
+                            );
+                          },
+                          child: Padding(
+                            padding: const EdgeInsets.all(8.0),
+                            child: Text(
+                              item['name'],
+                              textAlign: TextAlign.center,
+                              style: TextStyle(
+                                color: Colors.blue, // タップ可能であることを示す色
+                                decoration: TextDecoration.underline, // 下線を追加
+                              ),
+                            ),
+                          ),
                         ),
                         Padding(
                           padding: const EdgeInsets.all(8.0),
-                          child: Text(item['money'].toString(),
-                              textAlign: TextAlign.center),
+                          child: Text(
+                            item['money'].toString(),
+                            textAlign: TextAlign.center,
+                          ),
                         ),
                       ],
                     ),
