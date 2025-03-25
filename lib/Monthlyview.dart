@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
+import 'package:intl/intl.dart'; // intlパッケージをインポート
 
 class Monthlyview extends StatefulWidget {
-  final int? userId; // オプショナル型に変更
+  final int? userId; // オプショナル型
 
   const Monthlyview({Key? key, this.userId}) : super(key: key);
 
@@ -26,9 +27,9 @@ class _MonthlyviewState extends State<Monthlyview> {
     // メンバー情報を取得
     _fetchMembers();
 
-    // userIdが渡されてきた場合、データを取得
+    // userIdが提供されている場合にデータを取得
     if (widget.userId != null) {
-      _fetchData(widget.userId!); // userIdがnullでない場合に_fetchDataを呼び出す
+      _fetchData(widget.userId!);
     } else {
       print('userIdが提供されていません');
     }
@@ -48,7 +49,6 @@ class _MonthlyviewState extends State<Monthlyview> {
       print('Response body: ${response.body}');
 
       if (response.statusCode == 200) {
-        // UTF-8としてデコードして文字化けを回避
         final decodedResponse = utf8.decode(response.bodyBytes);
         final data = json.decode(decodedResponse);
 
@@ -62,11 +62,11 @@ class _MonthlyviewState extends State<Monthlyview> {
             }).toList();
             isLoadingMembers = false;
 
-            // userIdが渡されている場合、自動的に選択する
+            // userIdが渡されている場合、自動的に選択
             if (widget.userId != null) {
               final matchedMember = members.firstWhere(
                     (member) => member['id'] == widget.userId,
-                orElse: () => {}, // 一致するメンバーがいない場合は空のマップ
+                orElse: () => {}, // 空のマップ
               );
               if (matchedMember.isNotEmpty) {
                 selectedName = matchedMember['name'];
@@ -75,20 +75,19 @@ class _MonthlyviewState extends State<Monthlyview> {
             }
           });
         } else {
-          throw Exception('Invalid response format: expected a list.');
+          throw Exception('無効なレスポンス形式: リスト形式が期待されます。');
         }
       } else {
-        throw Exception('Failed to load members with status code: ${response.statusCode}');
+        throw Exception('メンバー情報の取得に失敗しました。ステータスコード: ${response.statusCode}');
       }
     } catch (e) {
-      print('Error fetching members: $e');
+      print('メンバー情報の取得中にエラーが発生しました: $e');
       setState(() {
         isLoadingMembers = false;
         members = [];
       });
     }
   }
-
 
   Future<void> _fetchData(int userId) async {
     setState(() {
@@ -105,17 +104,22 @@ class _MonthlyviewState extends State<Monthlyview> {
       );
 
       if (response.statusCode == 200) {
-        // UTF-8としてデコードして文字化けを回避
-        final decodedResponse = utf8.decode(response.bodyBytes); // 修正ポイント
+        final decodedResponse = utf8.decode(response.bodyBytes);
         final List<dynamic> data = json.decode(decodedResponse);
 
         setState(() {
-          fetchedData = data
-              .map((item) => {
-            'date': item['date'],
-            'money': item['money'],
-          })
-              .toList();
+          fetchedData = data.map((item) {
+            // 金額を安全に処理
+            final money = item['money'];
+            final int parsedMoney = money is String
+                ? int.tryParse(money.replaceAll(',', '')) ?? 0
+                : money ?? 0;
+
+            return {
+              'date': item['date'],
+              'money': _formatCurrency(parsedMoney), // カンマ区切りを適用
+            };
+          }).toList();
           isFetchingData = false;
         });
       } else {
@@ -125,7 +129,7 @@ class _MonthlyviewState extends State<Monthlyview> {
         });
       }
     } catch (e) {
-      print('Error fetching data: $e');
+      print('データ取得中にエラーが発生しました: $e');
       setState(() {
         isFetchingData = false;
         fetchedData = [];
@@ -133,6 +137,13 @@ class _MonthlyviewState extends State<Monthlyview> {
     }
   }
 
+  // カンマ区切りフォーマット関数
+  String _formatCurrency(int value) {
+    final formatter = NumberFormat('#,###'); // カンマ区切り
+    return formatter.format(value) + "円";
+  }
+
+  // 日付フォーマット関数
   String formatDate(String? isoDate) {
     if (isoDate == null) {
       return '日付未登録';
@@ -141,8 +152,13 @@ class _MonthlyviewState extends State<Monthlyview> {
     return '${parsedDate.year}年${parsedDate.month}月${parsedDate.day}日';
   }
 
+  // 合計貯金額を計算
   int calculateTotalSavings() {
-    return fetchedData.fold(0, (sum, item) => sum + (item['money'] as int));
+    return fetchedData.fold(0, (sum, item) {
+      final moneyStr = item['money'].replaceAll(RegExp(r'[^\d]'), '');
+      final moneyValue = int.tryParse(moneyStr) ?? 0;
+      return sum + moneyValue;
+    });
   }
 
   @override
@@ -193,7 +209,7 @@ class _MonthlyviewState extends State<Monthlyview> {
             Column(
               children: [
                 Text(
-                  '合計貯金額: ${calculateTotalSavings()}円',
+                  '合計貯金額: ${_formatCurrency(calculateTotalSavings())}',
                   style: const TextStyle(
                     fontSize: 18,
                     fontWeight: FontWeight.bold,
@@ -256,8 +272,13 @@ class _MonthlyviewState extends State<Monthlyview> {
                         Padding(
                           padding: const EdgeInsets.all(8.0),
                           child: Text(
-                            '${item['money']}円',
+                            item['money'],
                             textAlign: TextAlign.center,
+                            style: TextStyle(
+                              color: item['money'].startsWith('-')
+                                  ? Colors.red // マイナスの場合は赤文字
+                                  : Colors.black, // それ以外は黒文字
+                            ),
                           ),
                         ),
                       ],
@@ -276,4 +297,5 @@ class _MonthlyviewState extends State<Monthlyview> {
       ),
     );
   }
+
 }

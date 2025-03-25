@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
+import 'package:intl/intl.dart'; // intlパッケージをインポート
 
 import 'Monthlyview.dart';
 
@@ -34,10 +35,18 @@ class _SavingTotalState extends State<SavingTotal> {
         final List<dynamic> data = json.decode(utf8.decode(response.bodyBytes));
         print('Data received: $data'); // レスポンスデータをログに出力
         setState(() {
-          items = data.map((item) => {
-            'name': item['name'],
-            'money': (item['total_money'] ?? 0).toString() + "円",
-            'id':item['user_id'],
+          items = data.map((item) {
+            // 'total_money'の型がStringの場合も処理する
+            final totalMoney = item['total_money'];
+            final int parsedMoney = totalMoney is String
+                ? int.tryParse(totalMoney) ?? 0
+                : totalMoney ?? 0;
+
+            return {
+              'name': item['name'],
+              'money': _formatCurrency(parsedMoney), // カンマ区切りのフォーマットを適用
+              'id': item['user_id'],
+            };
           }).toList();
         });
       } else {
@@ -49,12 +58,19 @@ class _SavingTotalState extends State<SavingTotal> {
     }
   }
 
+
+  // カンマ区切りのフォーマットを適用する関数
+  String _formatCurrency(int value) {
+    final formatter = NumberFormat('#,###'); // カンマ区切りのフォーマット
+    return formatter.format(value) + "円";
+  }
+
   // 合計貯金額を計算する関数
   int _calculateTotalSavings() {
     return items.fold(0, (sum, item) {
-      final moneyStr = item['money'].replaceAll('円', ''); // '円'を除去
-      final moneyValue = int.tryParse(moneyStr) ?? 0;     // 文字列から数値に変換。失敗した場合は0を返す
-      return sum + moneyValue;                            // 合計に加算
+      final moneyStr = item['money'].replaceAll(RegExp(r'[^\d]'), ''); // 数字以外を除去
+      final moneyValue = int.tryParse(moneyStr) ?? 0; // 文字列から数値に変換。失敗した場合は0を返す
+      return sum + moneyValue; // 合計に加算
     });
   }
 
@@ -117,7 +133,6 @@ class _SavingTotalState extends State<SavingTotal> {
                         GestureDetector(
                           onTap: () {
                             final userId = item['id']; // itemsから直接useridを取得
-                            print(item['id']);
                             Navigator.push(
                               context,
                               MaterialPageRoute(
@@ -154,7 +169,7 @@ class _SavingTotalState extends State<SavingTotal> {
               child: Padding(
                 padding: const EdgeInsets.only(top: 16.0),
                 child: Text(
-                  '合計貯金額: $totalSavings円',
+                  '合計貯金額: ${_formatCurrency(totalSavings)}', // 合計金額にカンマ区切りを適用
                   style: TextStyle(
                     fontSize: 20, // テキストサイズ
                     fontWeight: FontWeight.bold, // 太字
