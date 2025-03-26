@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
+import 'package:flutter/services.dart';
 
 class AddTransactionPage extends StatefulWidget {
   @override
@@ -178,7 +179,10 @@ class _AddTransactionPageState extends State<AddTransactionPage> {
               decoration: InputDecoration(
                 labelText: '金額を入力',
               ),
-              keyboardType: TextInputType.numberWithOptions(signed: true), // マイナス入力を許可
+              keyboardType: TextInputType.numberWithOptions(signed: true),
+              inputFormatters: [
+                FilteringTextInputFormatter.allow(RegExp(r'^[\-\d]+')), // マイナスと数字を許可
+              ],
             ),
             const SizedBox(height: 20),
             ElevatedButton(

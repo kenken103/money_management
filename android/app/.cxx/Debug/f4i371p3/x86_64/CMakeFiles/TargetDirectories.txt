@@ -1,0 +1,2 @@
+C:/Users/kenta/StudioProjects/money_management/android/app/.cxx/Debug/f4i371p3/x86_64/CMakeFiles/edit_cache.dir
+C:/Users/kenta/StudioProjects/money_management/android/app/.cxx/Debug/f4i371p3/x86_64/CMakeFiles/rebuild_cache.dir
