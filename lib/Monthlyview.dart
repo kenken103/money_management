@@ -152,14 +152,14 @@ class _MonthlyviewState extends State<Monthlyview> {
     return '${parsedDate.year}年${parsedDate.month}月${parsedDate.day}日';
   }
 
-  // 合計貯金額を計算
   int calculateTotalSavings() {
     return fetchedData.fold(0, (sum, item) {
-      final moneyStr = item['money'].replaceAll(RegExp(r'[^\d]'), '');
+      final moneyStr = item['money'].replaceAll(RegExp(r'[^\d-]'), ''); // マイナス記号を含む数字を許可
       final moneyValue = int.tryParse(moneyStr) ?? 0;
-      return sum + moneyValue;
+      return sum + moneyValue; // マイナス値はそのまま減算される
     });
   }
+
 
   @override
   Widget build(BuildContext context) {
