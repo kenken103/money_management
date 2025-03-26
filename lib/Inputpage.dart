@@ -178,7 +178,7 @@ class _AddTransactionPageState extends State<AddTransactionPage> {
               decoration: InputDecoration(
                 labelText: '金額を入力',
               ),
-              keyboardType: TextInputType.number,
+              keyboardType: TextInputType.numberWithOptions(signed: true), // マイナス入力を許可
             ),
             const SizedBox(height: 20),
             ElevatedButton(
