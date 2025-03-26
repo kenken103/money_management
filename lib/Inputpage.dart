@@ -179,7 +179,7 @@ class _AddTransactionPageState extends State<AddTransactionPage> {
               decoration: InputDecoration(
                 labelText: '金額を入力',
               ),
-              keyboardType: TextInputType.numberWithOptions(signed: true),
+              keyboardType: TextInputType.emailAddress,
               inputFormatters: [
                 FilteringTextInputFormatter.allow(RegExp(r'^[\-\d]+')), // マイナスと数字を許可
               ],
